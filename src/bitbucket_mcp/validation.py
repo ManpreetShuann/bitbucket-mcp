@@ -101,6 +101,66 @@ def validate_positive_int(value: int, name: str) -> int:
     return value
 
 
+# --- Enum validators ---
+# These check membership in fixed sets of allowed values for Bitbucket API
+# parameters that accept a small, known set of strings.
+
+_VALID_PR_STATES = {"OPEN", "DECLINED", "MERGED", "ALL"}
+_VALID_PR_ROLES = {"AUTHOR", "REVIEWER", "PARTICIPANT"}
+_VALID_PR_ORDERS = {"OLDEST", "NEWEST"}
+_VALID_PR_DIRECTIONS = {"INCOMING", "OUTGOING"}
+_VALID_PARTICIPANT_STATUSES = {"APPROVED", "UNAPPROVED", "NEEDS_WORK"}
+_VALID_TASK_STATES = {"OPEN", "RESOLVED"}
+
+
+def validate_pr_state(state: str) -> str:
+    """Validate a pull-request state filter value."""
+    upper = state.upper()
+    if upper not in _VALID_PR_STATES:
+        raise ValidationError(f"Invalid PR state: {state!r}. Must be one of {sorted(_VALID_PR_STATES)}.")
+    return upper
+
+
+def validate_pr_role(role: str) -> str:
+    """Validate a pull-request role filter value."""
+    upper = role.upper()
+    if upper not in _VALID_PR_ROLES:
+        raise ValidationError(f"Invalid PR role: {role!r}. Must be one of {sorted(_VALID_PR_ROLES)}.")
+    return upper
+
+
+def validate_pr_order(order: str) -> str:
+    """Validate a pull-request ordering value."""
+    upper = order.upper()
+    if upper not in _VALID_PR_ORDERS:
+        raise ValidationError(f"Invalid PR order: {order!r}. Must be one of {sorted(_VALID_PR_ORDERS)}.")
+    return upper
+
+
+def validate_pr_direction(direction: str) -> str:
+    """Validate a pull-request direction filter value."""
+    upper = direction.upper()
+    if upper not in _VALID_PR_DIRECTIONS:
+        raise ValidationError(f"Invalid PR direction: {direction!r}. Must be one of {sorted(_VALID_PR_DIRECTIONS)}.")
+    return upper
+
+
+def validate_participant_status(status: str) -> str:
+    """Validate a pull-request participant status value."""
+    upper = status.upper()
+    if upper not in _VALID_PARTICIPANT_STATUSES:
+        raise ValidationError(f"Invalid participant status: {status!r}. Must be one of {sorted(_VALID_PARTICIPANT_STATUSES)}.")
+    return upper
+
+
+def validate_task_state(state: str) -> str:
+    """Validate a pull-request task state value."""
+    upper = state.upper()
+    if upper not in _VALID_TASK_STATES:
+        raise ValidationError(f"Invalid task state: {state!r}. Must be one of {sorted(_VALID_TASK_STATES)}.")
+    return upper
+
+
 # --- Clamp functions ---
 # These silently coerce values into safe bounds rather than raising, because
 # exceeding a limit is not an error condition — it just needs capping.

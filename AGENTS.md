@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-MCP server for Atlassian Bitbucket Server / Data Center (Enterprise) REST API. Provides 28 tools for managing projects, repositories, branches, files, commits, pull requests, and code search. No deletion operations by design.
+MCP server for Atlassian Bitbucket Server / Data Center (Enterprise) REST API. Provides 55 tools for managing projects, repositories, branches, files, commits, pull requests, and code search. No deletion operations by design.
 
 ## Tech Stack
 
@@ -26,8 +26,11 @@ src/bitbucket_mcp/
     branches.py      # list_branches, get_default_branch, create_branch, list_tags
     files.py         # browse_files, get_file_content, list_files
     commits.py       # list_commits, get_commit, get_commit_diff, get_commit_changes
-    pull_requests.py # All PR tools (CRUD, diff, commits, activities, comments)
-    search.py        # search_code
+    pull_requests.py # All PR tools (CRUD, diff, commits, activities, comments, tasks, approvals, watch)
+    dashboard.py     # list_dashboard_pull_requests, list_inbox_pull_requests
+    search.py        # search_code, find_file
+    users.py         # find_user
+    attachments.py   # get_attachment, get_attachment_metadata, save_attachment_metadata
 tests/
   conftest.py        # Shared fixtures (mcp, client, respx mocks)
   test_*.py          # One test file per tool module + client + validation

@@ -82,6 +82,31 @@ class TestPut:
         assert result == data
 
 
+class TestDelete:
+    async def test_delete_success(self, client: BitbucketClient, mock_router: respx.MockRouter):
+        mock_router.delete("/rest/api/1.0/projects/PROJ/repos/repo/pull-requests/1/approve").mock(
+            return_value=Response(200, json={"status": "UNAPPROVED"})
+        )
+        result = await client.delete("/projects/PROJ/repos/repo/pull-requests/1/approve")
+        assert result == {"status": "UNAPPROVED"}
+
+    async def test_delete_204(self, client: BitbucketClient, mock_router: respx.MockRouter):
+        mock_router.delete("/rest/api/1.0/projects/PROJ/repos/repo/pull-requests/1/watch").mock(
+            return_value=Response(204)
+        )
+        result = await client.delete("/projects/PROJ/repos/repo/pull-requests/1/watch")
+        assert result == {}
+
+    async def test_delete_error(self, client: BitbucketClient, mock_router: respx.MockRouter):
+        error_body = {"errors": [{"message": "Forbidden"}]}
+        mock_router.delete("/rest/api/1.0/projects/PROJ/repos/repo/pull-requests/1/approve").mock(
+            return_value=Response(403, json=error_body)
+        )
+        with pytest.raises(BitbucketAPIError) as exc_info:
+            await client.delete("/projects/PROJ/repos/repo/pull-requests/1/approve")
+        assert exc_info.value.status_code == 403
+
+
 class TestGetRaw:
     async def test_get_raw_returns_text(self, client: BitbucketClient, mock_router: respx.MockRouter):
         mock_router.get("/rest/api/1.0/projects/PROJ/repos/repo/raw/README.md").mock(

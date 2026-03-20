@@ -10,7 +10,11 @@ parsing in one place, and makes it trivial to mock the network layer in tests.
 
 from __future__ import annotations
 
+import logging
+
 import httpx
+
+logger = logging.getLogger("bitbucket_mcp.client")
 
 
 class BitbucketAPIError(Exception):
@@ -45,15 +49,23 @@ class BitbucketClient:
         )
 
     async def get(self, path: str, params: dict | None = None) -> dict:
+        logger.debug("GET /rest/api/1.0%s params=%s", path, params)
         response = await self._client.get(f"/rest/api/1.0{path}", params=params)
         return self._handle_response(response)
 
     async def post(self, path: str, json_data: dict | None = None, params: dict | None = None) -> dict:
+        logger.debug("POST /rest/api/1.0%s", path)
         response = await self._client.post(f"/rest/api/1.0{path}", json=json_data, params=params)
         return self._handle_response(response)
 
     async def put(self, path: str, json_data: dict | None = None, params: dict | None = None) -> dict:
+        logger.debug("PUT /rest/api/1.0%s", path)
         response = await self._client.put(f"/rest/api/1.0{path}", json=json_data, params=params)
+        return self._handle_response(response)
+
+    async def delete(self, path: str, params: dict | None = None) -> dict:
+        logger.debug("DELETE /rest/api/1.0%s", path)
+        response = await self._client.delete(f"/rest/api/1.0{path}", params=params)
         return self._handle_response(response)
 
     async def get_raw(self, path: str, params: dict | None = None) -> str:
@@ -63,6 +75,7 @@ class BitbucketClient:
         ``/raw/`` endpoint serves file contents with their original encoding
         rather than a JSON envelope.
         """
+        logger.debug("GET (raw) /rest/api/1.0%s", path)
         response = await self._client.get(f"/rest/api/1.0{path}", params=params)
         if response.status_code >= 400:
             self._handle_response(response)
@@ -74,8 +87,16 @@ class BitbucketClient:
         Bitbucket Server's code search is a separate plugin (backed by
         Elasticsearch) and uses ``/rest/search/latest/`` instead of the
         standard ``/rest/api/1.0/`` prefix.
+
+        Tries GET first (older Bitbucket Server versions), and falls back
+        to POST if the server returns 405 (newer Bitbucket Data Center
+        versions use POST with a JSON body).
         """
+        logger.debug("GET /rest/search/latest/search params=%s", params)
         response = await self._client.get("/rest/search/latest/search", params=params)
+        if response.status_code == 405:
+            logger.debug("GET returned 405, retrying as POST with JSON body")
+            response = await self._client.post("/rest/search/latest/search", json=params)
         return self._handle_response(response)
 
     async def get_paged(self, path: str, params: dict | None = None, start: int = 0, limit: int = 25) -> dict:
@@ -91,6 +112,7 @@ class BitbucketClient:
             # 5xx errors: return a generic message instead of leaking internal
             # server details (stack traces, class names) to the MCP caller.
             if response.status_code >= 500:
+                logger.warning("Server error %d for %s %s", response.status_code, response.request.method, response.request.url.path)
                 raise BitbucketAPIError(
                     response.status_code,
                     f"Bitbucket server error ({response.status_code}). Check server logs for details.",
@@ -102,6 +124,7 @@ class BitbucketClient:
             except Exception:
                 errors = []
                 message = "Request failed"
+            logger.warning("Client error %d: %s", response.status_code, message)
             raise BitbucketAPIError(response.status_code, message, errors)
 
         # 204 No Content — return an empty dict so callers always get a dict

@@ -1,6 +1,6 @@
 # Bitbucket Server MCP
 
-An MCP (Model Context Protocol) server for Atlassian Bitbucket Server / Data Center (Enterprise). Provides 28 tools for reading and writing projects, repositories, branches, files, commits, pull requests, and code search — with **no deletion operations** by design.
+An MCP (Model Context Protocol) server for Atlassian Bitbucket Server / Data Center (Enterprise). Provides 55 tools for reading and writing projects, repositories, branches, files, commits, pull requests, and code search — with **no deletion operations** by design.
 
 ## Prerequisites
 
@@ -18,12 +18,13 @@ uv sync
 
 ## Configuration
 
-Set two environment variables:
+Set two environment variables (plus one optional):
 
 | Variable | Description |
 |---|---|
 | `BITBUCKET_URL` | Base URL of your Bitbucket Server (e.g., `https://bitbucket.yourcompany.com`) |
 | `BITBUCKET_TOKEN` | HTTP access token (create in Bitbucket > User Settings > HTTP Access Tokens) |
+| `BITBUCKET_LOG_LEVEL` | Log level for stderr output: `DEBUG`, `INFO`, `WARNING`, `ERROR` (default: `INFO`) |
 
 ## Running
 
@@ -105,7 +106,7 @@ codex mcp add bitbucket \
   -- uv run --directory /path/to/bitbucket-mcp bitbucket-mcp
 ```
 
-## Tools (28 total)
+## Tools (55 total)
 
 ### Projects
 | Tool | Description |
@@ -146,22 +147,60 @@ codex mcp add bitbucket \
 ### Pull Requests
 | Tool | Description |
 |---|---|
-| `list_pull_requests` | List PRs with state filter (paginated) |
+| `list_pull_requests` | List PRs with state/direction/draft/title/participant filters (paginated) |
 | `get_pull_request` | Get PR details |
-| `create_pull_request` | Create a PR with reviewers |
-| `update_pull_request` | Update PR title/description/reviewers |
-| `merge_pull_request` | Merge a PR |
+| `create_pull_request` | Create a PR with reviewers (supports draft mode) |
+| `update_pull_request` | Update PR title/description/reviewers/draft status |
+| `can_merge_pull_request` | Check merge readiness (canMerge, conflicts, vetoes) |
+| `merge_pull_request` | Merge a PR with optional strategy |
 | `decline_pull_request` | Decline a PR |
+| `reopen_pull_request` | Reopen a declined PR |
+| `approve_pull_request` | Approve a PR |
+| `unapprove_pull_request` | Remove your approval |
+| `request_changes_pull_request` | Request changes on a PR |
+| `remove_change_request_pull_request` | Remove your change request |
+| `list_pull_request_participants` | List reviewers with roles and statuses |
+| `watch_pull_request` | Subscribe as a watcher |
+| `unwatch_pull_request` | Unsubscribe from watching |
+| `get_commit_message_suggestion` | Get suggested commit message for merge |
 | `get_pull_request_diff` | Get PR diff |
+| `get_pull_request_diff_stat` | Get per-file change list (added/modified/deleted) |
 | `list_pull_request_commits` | List commits in a PR |
 | `get_pull_request_activities` | Get PR activity feed |
 | `list_pull_request_comments` | List comments on a PR |
-| `add_pull_request_comment` | Add a comment (general, inline, or reply) |
+| `get_pull_request_comment` | Get a specific comment |
+| `add_pull_request_comment` | Add a comment (general, inline, reply, or blocker task) |
+| `update_pull_request_comment` | Edit a comment |
+| `resolve_pull_request_comment` | Resolve a comment thread |
+| `reopen_pull_request_comment` | Reopen a resolved thread |
+| `list_pull_request_tasks` | List PR tasks |
+| `create_pull_request_task` | Create a task (optionally linked to a comment) |
+| `get_pull_request_task` | Get a specific task |
+| `update_pull_request_task` | Update task content or state |
+
+### Dashboard
+| Tool | Description |
+|---|---|
+| `list_dashboard_pull_requests` | List PRs visible to the authenticated user across all repos (paginated) |
+| `list_inbox_pull_requests` | List PRs in the user's inbox needing review action (paginated) |
 
 ### Search
 | Tool | Description |
 |---|---|
 | `search_code` | Search code across repos (requires Elasticsearch) |
+| `find_file` | Find files by name or path pattern with wildcards |
+
+### Users
+| Tool | Description |
+|---|---|
+| `find_user` | Search users by name, username, or email |
+
+### Attachments
+| Tool | Description |
+|---|---|
+| `get_attachment` | Download an attachment by ID |
+| `get_attachment_metadata` | Get attachment metadata |
+| `save_attachment_metadata` | Create or update attachment metadata |
 
 ## Running Tests
 

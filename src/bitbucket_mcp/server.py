@@ -5,25 +5,56 @@ Reads configuration from environment variables, validates it, wires up the
 on stdio transport.
 
 Environment variables:
-    BITBUCKET_URL   — Base URL of the Bitbucket Server instance (required).
-    BITBUCKET_TOKEN — Personal-access / HTTP-access token (required).
+    BITBUCKET_URL       — Base URL of the Bitbucket Server instance (required).
+    BITBUCKET_TOKEN     — Personal-access / HTTP-access token (required).
+    BITBUCKET_LOG_LEVEL — Logging level: DEBUG, INFO, WARNING, ERROR (default: INFO).
 """
 
 from __future__ import annotations
 
 import atexit
 import asyncio
+import logging
 import os
 import sys
 
 from mcp.server.fastmcp import FastMCP
 
 from bitbucket_mcp.client import BitbucketClient
-from bitbucket_mcp.tools import branches, commits, files, projects, pull_requests, repositories, search
+from bitbucket_mcp.tools import attachments, branches, commits, dashboard, files, projects, pull_requests, repositories, search, users
 from bitbucket_mcp.validation import ValidationError, validate_base_url
+
+logger = logging.getLogger("bitbucket_mcp.server")
+
+
+def _configure_logging() -> None:
+    """Configure logging to stderr with level from BITBUCKET_LOG_LEVEL env var.
+
+    stdout is reserved for MCP JSON-RPC protocol traffic, so all log output
+    goes to stderr.  Defaults to INFO if the env var is missing or invalid.
+    """
+    level_name = os.environ.get("BITBUCKET_LOG_LEVEL", "INFO").upper()
+    level = getattr(logging, level_name, logging.INFO)
+
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(
+        logging.Formatter(
+            "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%S",
+        )
+    )
+
+    root_logger = logging.getLogger("bitbucket_mcp")
+    root_logger.setLevel(level)
+    root_logger.addHandler(handler)
+    # Prevent propagation to the root logger, which might have a default
+    # handler writing to stdout and interfere with the MCP protocol.
+    root_logger.propagate = False
 
 
 def main() -> None:
+    _configure_logging()
+
     # --- Environment variable validation ---
     # Fail fast with clear error messages if required config is missing,
     # before constructing any objects.
@@ -59,6 +90,8 @@ def main() -> None:
     # loop does not provide a shutdown hook.
     atexit.register(lambda: asyncio.run(client.close()))
 
+    logger.info("Starting Bitbucket MCP server (base_url=%s)", base_url)
+
     # Each tool module's register_tools() takes the shared mcp + client and
     # uses @mcp.tool() closures to register its tools. This keeps tool
     # definitions co-located with their domain logic.
@@ -68,7 +101,10 @@ def main() -> None:
     files.register_tools(mcp, client)
     commits.register_tools(mcp, client)
     pull_requests.register_tools(mcp, client)
+    dashboard.register_tools(mcp, client)
     search.register_tools(mcp, client)
+    users.register_tools(mcp, client)
+    attachments.register_tools(mcp, client)
 
     # Starts the MCP server on stdio transport (stdin/stdout JSON-RPC).
     mcp.run()

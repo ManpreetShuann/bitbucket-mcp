@@ -92,3 +92,26 @@ SAMPLE_COMMENT = {
     "author": {"name": "reviewer"},
     "createdDate": 1700000000000,
 }
+
+SAMPLE_PARTICIPANT = {
+    "user": {"name": "reviewer", "slug": "reviewer", "displayName": "Reviewer User"},
+    "role": "REVIEWER",
+    "approved": True,
+    "status": "APPROVED",
+}
+
+SAMPLE_TASK = {
+    "id": 100,
+    "text": "Fix the tests",
+    "state": "OPEN",
+    "author": {"name": "reviewer"},
+}
+
+SAMPLE_USER = {
+    "name": "jsmith",
+    "slug": "jsmith",
+    "displayName": "John Smith",
+    "emailAddress": "jsmith@example.com",
+    "active": True,
+    "type": "NORMAL",
+}

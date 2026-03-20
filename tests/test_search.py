@@ -50,3 +50,65 @@ class TestSearchCode:
             result = await tools["search_code"](query="hello")
         assert "not available" in result.lower()
         assert "Elasticsearch" in result
+
+
+    async def test_405_falls_back_to_post(self, setup):
+        _, tools = setup
+        data = {"values": [{"file": {"path": "src/app.py"}, "hitCount": 1}]}
+        with respx.mock(base_url=BASE_URL) as router:
+            router.get("/rest/search/latest/search").mock(return_value=Response(405))
+            post_route = router.post("/rest/search/latest/search").mock(return_value=Response(200, json=data))
+            result = await tools["search_code"](query="def main")
+        parsed = json.loads(result)
+        assert len(parsed["values"]) == 1
+        assert post_route.called
+
+    async def test_405_on_both_returns_friendly_message(self, setup):
+        _, tools = setup
+        error_body = {"errors": [{"message": "Method not allowed"}]}
+        with respx.mock(base_url=BASE_URL) as router:
+            router.get("/rest/search/latest/search").mock(return_value=Response(405))
+            router.post("/rest/search/latest/search").mock(return_value=Response(405, json=error_body))
+            result = await tools["search_code"](query="hello")
+        assert "not available" in result.lower()
+
+
+class TestFindFile:
+    async def test_returns_results(self, setup):
+        _, tools = setup
+        data = {"values": [{"file": {"path": "src/utils/helper.py"}}]}
+        with respx.mock(base_url=BASE_URL) as router:
+            route = router.get("/rest/search/latest/search").mock(return_value=Response(200, json=data))
+            result = await tools["find_file"](query="helper.py")
+        parsed = json.loads(result)
+        assert len(parsed["values"]) == 1
+        assert "type=path" in str(route.calls[0].request.url)
+
+    async def test_with_project_filter(self, setup):
+        _, tools = setup
+        data = {"values": []}
+        with respx.mock(base_url=BASE_URL) as router:
+            route = router.get("/rest/search/latest/search").mock(return_value=Response(200, json=data))
+            await tools["find_file"](query="*.pks", project_key="PROJ")
+        url = str(route.calls[0].request.url)
+        assert "project.key=PROJ" in url
+        assert "type=path" in url
+
+    async def test_404_returns_friendly_message(self, setup):
+        _, tools = setup
+        error_body = {"errors": [{"message": "Not found"}]}
+        with respx.mock(base_url=BASE_URL) as router:
+            router.get("/rest/search/latest/search").mock(return_value=Response(404, json=error_body))
+            result = await tools["find_file"](query="hello")
+        assert "not available" in result.lower()
+
+    async def test_405_falls_back_to_post(self, setup):
+        _, tools = setup
+        data = {"values": [{"file": {"path": "src/utils/helper.py"}}]}
+        with respx.mock(base_url=BASE_URL) as router:
+            router.get("/rest/search/latest/search").mock(return_value=Response(405))
+            post_route = router.post("/rest/search/latest/search").mock(return_value=Response(200, json=data))
+            result = await tools["find_file"](query="helper.py")
+        parsed = json.loads(result)
+        assert len(parsed["values"]) == 1
+        assert post_route.called
