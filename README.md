@@ -165,6 +165,9 @@ Add to `.vscode/mcp.json` in your workspace:
 
 Add to `~/.codex/config.toml`:
 
+<details>
+<summary>With uvx (recommended)</summary>
+
 ```toml
 [mcp_servers.bitbucket]
 command = "uvx"
@@ -183,6 +186,60 @@ codex mcp add bitbucket \
   --env BITBUCKET_TOKEN=your-token-here \
   -- uvx bitbucket-server-mcp
 ```
+
+</details>
+
+<details>
+<summary>With pip</summary>
+
+```bash
+pip install bitbucket-server-mcp
+```
+
+```toml
+[mcp_servers.bitbucket]
+command = "bitbucket-server-mcp"
+args = []
+
+[mcp_servers.bitbucket.env]
+BITBUCKET_URL = "https://bitbucket.yourcompany.com"
+BITBUCKET_TOKEN = "your-token-here"
+```
+
+Or via CLI:
+
+```bash
+codex mcp add bitbucket \
+  --env BITBUCKET_URL=https://bitbucket.yourcompany.com \
+  --env BITBUCKET_TOKEN=your-token-here \
+  -- bitbucket-server-mcp
+```
+
+</details>
+
+<details>
+<summary>With Docker</summary>
+
+```toml
+[mcp_servers.bitbucket]
+command = "docker"
+args = ["run", "--rm", "-i", "-e", "BITBUCKET_URL", "-e", "BITBUCKET_TOKEN", "bitbucket-server-mcp"]
+
+[mcp_servers.bitbucket.env]
+BITBUCKET_URL = "https://bitbucket.yourcompany.com"
+BITBUCKET_TOKEN = "your-token-here"
+```
+
+Or via CLI:
+
+```bash
+codex mcp add bitbucket \
+  --env BITBUCKET_URL=https://bitbucket.yourcompany.com \
+  --env BITBUCKET_TOKEN=your-token-here \
+  -- docker run --rm -i -e BITBUCKET_URL -e BITBUCKET_TOKEN bitbucket-server-mcp
+```
+
+</details>
 
 ## Tools (54 total)
 
