@@ -50,7 +50,7 @@ jobs:
       - name: Python Semantic Release — Determine version
         id: semver
         run: |
-          OUTPUT=$(semantic-release version --print 2>/dev/null) || true
+          OUTPUT=$(semantic-release --noop version --print 2>/dev/null) || true
           echo "new_version=$OUTPUT" >> "$GITHUB_OUTPUT"
           if [ -z "$OUTPUT" ]; then
             echo "released=false" >> "$GITHUB_OUTPUT"
@@ -60,13 +60,12 @@ jobs:
             echo "New version: $OUTPUT"
           fi
 
-      - name: Python Semantic Release — Apply version & tag
+      - name: Python Semantic Release — Version, changelog & tag
         if: steps.semver.outputs.released == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          semantic-release version
-          git push origin master --tags
+          semantic-release version --no-vcs-release
 
       - name: Build package
         if: steps.semver.outputs.released == 'true'
@@ -93,7 +92,7 @@ jobs:
         run: |
           gh release create "v${{ steps.semver.outputs.new_version }}" dist/* \
             --title "v${{ steps.semver.outputs.new_version }}" \
-            --generate-notes
+            --notes-file CHANGELOG.md
 
       - name: Summary
         if: steps.semver.outputs.released == 'true'
