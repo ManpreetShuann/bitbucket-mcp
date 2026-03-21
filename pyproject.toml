@@ -1,5 +1,5 @@
 [project]
-name = "bitbucket-mcp"
+name = "bitbucket-server-mcp"
 version = "1.3.1"
 description = "MCP server for Atlassian Bitbucket Server (Enterprise) REST API"
 license = "MIT"
@@ -43,7 +43,7 @@ dev = [
 ]
 
 [project.scripts]
-bitbucket-mcp = "bitbucket_mcp.server:main"
+bitbucket-server-mcp = "bitbucket_mcp.server:main"
 
 [build-system]
 requires = ["hatchling"]

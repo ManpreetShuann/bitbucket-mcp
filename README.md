@@ -1,8 +1,8 @@
 # Bitbucket Server MCP
 
 [![CI](https://github.com/ManpreetShuann/bitbucket-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/ManpreetShuann/bitbucket-mcp/actions/workflows/ci.yml)
-[![PyPI version](https://img.shields.io/pypi/v/bitbucket-mcp)](https://pypi.org/project/bitbucket-mcp/)
-[![Python](https://img.shields.io/pypi/pyversions/bitbucket-mcp)](https://pypi.org/project/bitbucket-mcp/)
+[![PyPI version](https://img.shields.io/pypi/v/bitbucket-server-mcp)](https://pypi.org/project/bitbucket-server-mcp/)
+[![Python](https://img.shields.io/pypi/pyversions/bitbucket-server-mcp)](https://pypi.org/project/bitbucket-server-mcp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An MCP (Model Context Protocol) server for Atlassian Bitbucket Server / Data Center (Enterprise). Provides 54 tools for reading and writing projects, repositories, branches, files, commits, pull requests, and code search — with **no deletion operations** by design.
@@ -12,13 +12,13 @@ An MCP (Model Context Protocol) server for Atlassian Bitbucket Server / Data Cen
 ### From PyPI (recommended)
 
 ```bash
-pip install bitbucket-mcp
+pip install bitbucket-server-mcp
 ```
 
 Or with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-uv pip install bitbucket-mcp
+uv pip install bitbucket-server-mcp
 ```
 
 ### From source
@@ -33,7 +33,7 @@ uv sync
 
 ```bash
 cd bitbucket-mcp
-docker build -t bitbucket-mcp .
+docker build -t bitbucket-server-mcp .
 ```
 
 ## Prerequisites
@@ -67,7 +67,7 @@ Add to `~/.claude.json` or project `.claude/settings.json`:
   "mcpServers": {
     "bitbucket": {
       "command": "uv",
-      "args": ["run", "--directory", "/path/to/bitbucket-mcp", "bitbucket-mcp"],
+      "args": ["run", "--directory", "/path/to/bitbucket-mcp", "bitbucket-server-mcp"],
       "env": {
         "BITBUCKET_URL": "https://bitbucket.yourcompany.com",
         "BITBUCKET_TOKEN": "your-token-here"
@@ -87,7 +87,7 @@ Add to `~/.claude.json` or project `.claude/settings.json`:
   "mcpServers": {
     "bitbucket": {
       "command": "docker",
-      "args": ["run", "--rm", "-i", "-e", "BITBUCKET_URL", "-e", "BITBUCKET_TOKEN", "bitbucket-mcp"],
+      "args": ["run", "--rm", "-i", "-e", "BITBUCKET_URL", "-e", "BITBUCKET_TOKEN", "bitbucket-server-mcp"],
       "env": {
         "BITBUCKET_URL": "https://bitbucket.yourcompany.com",
         "BITBUCKET_TOKEN": "your-token-here"
@@ -112,7 +112,7 @@ Add to `.vscode/mcp.json` in your workspace:
     "bitbucket": {
       "type": "stdio",
       "command": "uv",
-      "args": ["run", "--directory", "/path/to/bitbucket-mcp", "bitbucket-mcp"],
+      "args": ["run", "--directory", "/path/to/bitbucket-mcp", "bitbucket-server-mcp"],
       "env": {
         "BITBUCKET_URL": "https://bitbucket.yourcompany.com",
         "BITBUCKET_TOKEN": "${input:bitbucket-token}"
@@ -141,7 +141,7 @@ Add to `.vscode/mcp.json` in your workspace:
     "bitbucket": {
       "type": "stdio",
       "command": "docker",
-      "args": ["run", "--rm", "-i", "-e", "BITBUCKET_URL", "-e", "BITBUCKET_TOKEN", "bitbucket-mcp"],
+      "args": ["run", "--rm", "-i", "-e", "BITBUCKET_URL", "-e", "BITBUCKET_TOKEN", "bitbucket-server-mcp"],
       "env": {
         "BITBUCKET_URL": "https://bitbucket.yourcompany.com",
         "BITBUCKET_TOKEN": "${input:bitbucket-token}"
@@ -168,7 +168,7 @@ Add to `~/.codex/config.toml`:
 ```toml
 [mcp_servers.bitbucket]
 command = "uv"
-args = ["run", "--directory", "/path/to/bitbucket-mcp", "bitbucket-mcp"]
+args = ["run", "--directory", "/path/to/bitbucket-mcp", "bitbucket-server-mcp"]
 
 [mcp_servers.bitbucket.env]
 BITBUCKET_URL = "https://bitbucket.yourcompany.com"
@@ -181,7 +181,7 @@ Or via CLI:
 codex mcp add bitbucket \
   --env BITBUCKET_URL=https://bitbucket.yourcompany.com \
   --env BITBUCKET_TOKEN=your-token-here \
-  -- uv run --directory /path/to/bitbucket-mcp bitbucket-mcp
+  -- uv run --directory /path/to/bitbucket-mcp bitbucket-server-mcp
 ```
 
 ## Tools (54 total)

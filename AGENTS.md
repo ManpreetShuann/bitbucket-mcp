@@ -50,7 +50,7 @@ tests/
 
 ```bash
 uv sync                              # Install dependencies
-uv run bitbucket-mcp                 # Run the server (requires BITBUCKET_URL + BITBUCKET_TOKEN)
+uv run bitbucket-server-mcp           # Run the server (requires BITBUCKET_URL + BITBUCKET_TOKEN)
 uv run pytest -v                     # Run all tests
 uv run pytest tests/test_projects.py -v  # Run a single test file
 uv run ruff check src/ tests/        # Lint

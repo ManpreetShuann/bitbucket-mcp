@@ -16,7 +16,7 @@ jobs:
 
     environment:
       name: pypi
-      url: https://pypi.org/p/bitbucket-mcp
+      url: https://pypi.org/p/bitbucket-server-mcp
 
     steps:
       - uses: actions/checkout@v4
@@ -78,7 +78,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           # Uses trusted publishing (OIDC) — no API token needed
-          # Configure at: https://pypi.org/manage/project/bitbucket-mcp/settings/publishing/
+          # Configure at: https://pypi.org/manage/project/bitbucket-server-mcp/settings/publishing/
           print-hash: true
 
       - name: Create GitHub Release
@@ -94,4 +94,4 @@ jobs:
           echo "## Release v${{ steps.semver.outputs.new_version }}" >> $GITHUB_STEP_SUMMARY
           echo "- Published to PyPI" >> $GITHUB_STEP_SUMMARY
           echo "- GitHub Release created" >> $GITHUB_STEP_SUMMARY
-          echo "- Install: \`pip install bitbucket-mcp==${{ steps.semver.outputs.new_version }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- Install: \`pip install bitbucket-server-mcp==${{ steps.semver.outputs.new_version }}\`" >> $GITHUB_STEP_SUMMARY

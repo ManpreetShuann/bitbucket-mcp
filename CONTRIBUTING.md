@@ -55,7 +55,7 @@ These are only needed when running the server locally. Tests do not require them
 ### Running the server locally
 
 ```bash
-BITBUCKET_URL=https://bitbucket.example.com BITBUCKET_TOKEN=your-token uv run bitbucket-mcp
+BITBUCKET_URL=https://bitbucket.example.com BITBUCKET_TOKEN=your-token uv run bitbucket-server-mcp
 ```
 
 ### Running tests
