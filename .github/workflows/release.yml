@@ -64,18 +64,23 @@ jobs:
         if: steps.skip.outputs.is_release != 'true'
         id: semver
         run: |
+          # Get current version from pyproject.toml
+          CURRENT=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "Current version: $CURRENT"
+
           OUTPUT=$(semantic-release version --print 2>&1) || true
-          # --print outputs the next version number or nothing if no release needed
           # Filter to only a valid semver line (digits and dots)
           VERSION=$(echo "$OUTPUT" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+' | tail -1)
-          echo "new_version=$VERSION" >> "$GITHUB_OUTPUT"
-          if [ -z "$VERSION" ]; then
+
+          # Only release if PSR proposes a genuinely new version
+          if [ -z "$VERSION" ] || [ "$VERSION" = "$CURRENT" ]; then
             echo "released=false" >> "$GITHUB_OUTPUT"
-            echo "No new release needed."
-            echo "PSR output: $OUTPUT"
+            echo "new_version=" >> "$GITHUB_OUTPUT"
+            echo "No new release needed (current: $CURRENT, proposed: ${VERSION:-none})."
           else
             echo "released=true" >> "$GITHUB_OUTPUT"
-            echo "New version: $VERSION"
+            echo "new_version=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "New version: $VERSION (current: $CURRENT)"
           fi
 
       - name: Python Semantic Release — Version, changelog & tag
