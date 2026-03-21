@@ -1,7 +1,9 @@
 name: Release
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
     branches: [master]
 
 permissions:
@@ -11,8 +13,10 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    # Only run on non-release commits to avoid infinite loops
-    if: "!startsWith(github.event.head_commit.message, 'chore(release):')"
+    # Only run when CI succeeds and not on release commits (avoid infinite loops)
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      !startsWith(github.event.workflow_run.head_commit.message, 'chore(release):')
 
     environment:
       name: pypi
@@ -46,7 +50,7 @@ jobs:
       - name: Python Semantic Release — Determine version
         id: semver
         run: |
-          OUTPUT=$(semantic-release version --print 2>&1) || true
+          OUTPUT=$(semantic-release version --noop --print 2>&1) || true
           echo "new_version=$OUTPUT" >> "$GITHUB_OUTPUT"
           if [ -z "$OUTPUT" ]; then
             echo "released=false" >> "$GITHUB_OUTPUT"
@@ -61,7 +65,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          semantic-release version
+          semantic-release version --no-push
 
       - name: Build package
         if: steps.semver.outputs.released == 'true'

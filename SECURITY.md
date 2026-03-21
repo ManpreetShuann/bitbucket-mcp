@@ -14,7 +14,7 @@ If you discover a security vulnerability in this project, **please report it res
 ### How to report
 
 1. **Do NOT open a public GitHub issue.**
-2. Email the maintainers with:
+2. Use [GitHub's private vulnerability reporting](https://github.com/ManpreetShuann/bitbucket-server-mcp/security/advisories/new) or email the maintainers at **manpreetshuann@gmail.com** with:
    - A description of the vulnerability
    - Steps to reproduce
    - Potential impact
