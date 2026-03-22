@@ -889,6 +889,7 @@ class TestPublishDraftPullRequest:
         body = json.loads(route.calls[0].request.content)
         assert body["draft"] is False
         assert body["version"] == 0
+        assert body["description"] == current_pr["description"]
 
     async def test_invalid_pr_id(self, setup):
         _, tools = setup
@@ -918,6 +919,7 @@ class TestConvertToDraft:
         body = json.loads(route.calls[0].request.content)
         assert body["draft"] is True
         assert body["version"] == 0
+        assert body["description"] == current_pr["description"]
 
     async def test_invalid_pr_id(self, setup):
         _, tools = setup

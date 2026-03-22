@@ -350,6 +350,7 @@ def register_tools(mcp: FastMCP, client: BitbucketClient) -> None:
             body: dict = {
                 "version": version,
                 "title": current.get("title", ""),
+                "description": current.get("description", ""),
                 "draft": False,
                 "toRef": current.get("toRef", {}),
                 "reviewers": current.get("reviewers", []),
@@ -387,6 +388,7 @@ def register_tools(mcp: FastMCP, client: BitbucketClient) -> None:
             body: dict = {
                 "version": version,
                 "title": current.get("title", ""),
+                "description": current.get("description", ""),
                 "draft": True,
                 "toRef": current.get("toRef", {}),
                 "reviewers": current.get("reviewers", []),
