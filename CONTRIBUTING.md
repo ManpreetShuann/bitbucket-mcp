@@ -86,6 +86,8 @@ src/bitbucket_mcp/
     search.py        # search_code, find_file
     users.py         # find_user
     attachments.py   # get_attachment, get/save attachment_metadata
+    dangerous.py     # opt-in Tier-1 delete tools (branch, tag, PR, comment, task, attachment)
+    destructive.py   # opt-in Tier-2 delete tools (project, repository)
 tests/
   conftest.py        # Shared fixtures and sample data
   test_*.py          # One test file per tool module + client + validation
@@ -97,7 +99,7 @@ tests/
 - **HTTP abstraction** — tool modules never construct `httpx` requests directly. All HTTP goes through `BitbucketClient`.
 - **Validate at the tool level** — every tool validates its arguments before calling the client.
 - **Tools return strings** — either JSON-serialised data or error messages. No exceptions propagate to the MCP framework.
-- **No deletion operations** — this is a deliberate design constraint (see [Security Rules](#security-rules)).
+- **Gated deletion operations** — delete tools are disabled by default and require explicit opt-in via environment variables (see [Security Rules](#security-rules)).
 
 ---
 
@@ -388,7 +390,7 @@ Before requesting review, verify:
 - [ ] New tools have corresponding tests covering happy path, validation, and error handling.
 - [ ] Input validation is in place for all new tool arguments (see [Input Validation](#input-validation)).
 - [ ] `README.md` tool count and inventory updated (if tools were added).
-- [ ] No deletion operations added (see [Security Rules](#security-rules)).
+- [ ] Deletion operations (if any) are gated behind environment variables (see [Security Rules](#security-rules)).
 - [ ] No hardcoded credentials, tokens, or secrets.
 - [ ] Commit messages follow Conventional Commits format (versioning is automated by PSR).
 
@@ -404,7 +406,7 @@ Before requesting review, verify:
 
 These are hard rules that apply to all contributions. PRs that violate them will be rejected.
 
-1. **No deletion operations.** Do not add tools that delete resources. This is a deliberate design constraint to limit blast radius.
+1. **Gated deletion operations.** Delete tools must be disabled by default and gated behind environment variables (`BITBUCKET_ALLOW_DANGEROUS_DELETE` for Tier-1, `BITBUCKET_ALLOW_DESTRUCTIVE_DELETE` for Tier-2). Tier-2 requires both variables. New delete tools must be placed in `dangerous.py` or `destructive.py` and registered conditionally in `server.py`.
 
 2. **Validate all inputs.** Every tool argument interpolated into a URL path must pass through a validator in `validation.py`. No exceptions.
 
