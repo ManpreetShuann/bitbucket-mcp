@@ -1,6 +1,27 @@
 # CHANGELOG
 
 
+## v1.6.0 (2026-03-22)
+
+### Bug Fixes
+
+- Reject double slashes and trailing slashes in branch/tag validators
+  ([`65216fb`](https://github.com/ManpreetShuann/bitbucket-server-mcp/commit/65216fb5bc1f31ae1a26af922c8fcc18222d5024))
+
+### Documentation
+
+- Sync all documentation with actual tool inventory (66 tools)
+  ([`f91c94b`](https://github.com/ManpreetShuann/bitbucket-server-mcp/commit/f91c94bfa30bf7e2452fdd0ee14854fa57f16212))
+
+- Update README and CONTRIBUTING to reflect gated deletion model
+  ([`0c4c96b`](https://github.com/ManpreetShuann/bitbucket-server-mcp/commit/0c4c96bf878e423f5c4736c05ce23472b9ee4f87))
+
+### Features
+
+- Add two-tier delete operations gated by environment variables
+  ([`711546d`](https://github.com/ManpreetShuann/bitbucket-server-mcp/commit/711546d961ed0e023ec18a2ae193257f36a1b0b0))
+
+
 ## v1.5.0 (2026-03-22)
 
 ### Bug Fixes
