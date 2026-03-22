@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-MCP server for Atlassian Bitbucket Server / Data Center (Enterprise) REST API. Provides 54 tools for managing projects, repositories, branches, files, commits, pull requests, and code search. No deletion operations by design.
+MCP server for Atlassian Bitbucket Server / Data Center (Enterprise) REST API. Provides 66 tools for managing projects, repositories, branches, files, commits, pull requests, and code search — with opt-in gated deletion operations (disabled by default, enabled via environment variables).
 
 ## Tech Stack
 
@@ -34,6 +34,8 @@ src/bitbucket_mcp/
     search.py        # search_code, find_file
     users.py         # find_user
     attachments.py   # get_attachment, get_attachment_metadata, save_attachment_metadata
+    dangerous.py     # opt-in Tier-1 delete tools (branch, tag, PR, comment, task, attachment)
+    destructive.py   # opt-in Tier-2 delete tools (project, repository)
 tests/
   conftest.py        # Shared fixtures (mcp, client, respx mocks)
   test_*.py          # One test file per tool module + client + validation
@@ -124,7 +126,7 @@ Examples:
 
 ### Security
 
-- No deletion operations — this is a deliberate design constraint
+- Deletion operations are gated behind environment variables (`BITBUCKET_ALLOW_DANGEROUS_DELETE` for Tier-1, `BITBUCKET_ALLOW_DESTRUCTIVE_DELETE` for Tier-2). When disabled (default), delete tools are not registered and have zero attack surface.
 - Path traversal protection in `validate_path()`
 - 5xx responses are sanitised before returning to MCP callers
 - Never log or expose the `BITBUCKET_TOKEN`

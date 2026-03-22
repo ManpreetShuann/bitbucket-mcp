@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/bitbucket-server-mcp)](https://pypi.org/project/bitbucket-server-mcp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An MCP (Model Context Protocol) server for Atlassian Bitbucket Server / Data Center (Enterprise). Provides 54 tools for reading and writing projects, repositories, branches, files, commits, pull requests, and code search — with **no deletion operations** by design.
+An MCP (Model Context Protocol) server for Atlassian Bitbucket Server / Data Center (Enterprise). Provides 66 tools for reading and writing projects, repositories, branches, files, commits, pull requests, and code search — with **opt-in gated deletion operations** (disabled by default, see [SECURITY.md](SECURITY.md)).
 
 ## Installation
 
@@ -43,13 +43,15 @@ docker build -t bitbucket-server-mcp .
 
 ## Configuration
 
-Set two environment variables (plus one optional):
+Set two required environment variables (plus optional ones):
 
-| Variable | Description |
-|---|---|
-| `BITBUCKET_URL` | Base URL of your Bitbucket Server (e.g., `https://bitbucket.yourcompany.com`) |
-| `BITBUCKET_TOKEN` | HTTP access token (create in Bitbucket > User Settings > HTTP Access Tokens) |
-| `BITBUCKET_LOG_LEVEL` | Log level for stderr output: `DEBUG`, `INFO`, `WARNING`, `ERROR` (default: `INFO`) |
+| Variable | Required | Description |
+|---|---|---|
+| `BITBUCKET_URL` | Yes | Base URL of your Bitbucket Server (e.g., `https://bitbucket.yourcompany.com`). Must use HTTPS. |
+| `BITBUCKET_TOKEN` | Yes | HTTP access token (create in Bitbucket > User Settings > HTTP Access Tokens) |
+| `BITBUCKET_LOG_LEVEL` | No | Log level for stderr output: `DEBUG`, `INFO`, `WARNING`, `ERROR` (default: `INFO`) |
+| `BITBUCKET_ALLOW_DANGEROUS_DELETE` | No | Set to `1` to enable Tier-1 delete tools (branch, tag, PR, comment, task, attachment) |
+| `BITBUCKET_ALLOW_DESTRUCTIVE_DELETE` | No | Set to `1` to enable Tier-2 delete tools (project, repository). Requires `BITBUCKET_ALLOW_DANGEROUS_DELETE=1` |
 
 ## Integration
 
@@ -314,7 +316,7 @@ codex mcp add bitbucket \
 
 </details>
 
-## Tools (54 total)
+## Tools (66 total)
 
 ### Projects
 | Tool | Description |
@@ -359,6 +361,9 @@ codex mcp add bitbucket \
 | `get_pull_request` | Get PR details |
 | `create_pull_request` | Create a PR with reviewers (supports draft mode) |
 | `update_pull_request` | Update PR title/description/reviewers/draft status |
+| `create_draft_pull_request` | Create a PR in draft mode |
+| `publish_draft_pull_request` | Publish a draft PR (mark as ready for review) |
+| `convert_to_draft` | Convert an open PR back to draft |
 | `can_merge_pull_request` | Check merge readiness (canMerge, conflicts, vetoes) |
 | `merge_pull_request` | Merge a PR with optional strategy |
 | `decline_pull_request` | Decline a PR |
@@ -409,6 +414,23 @@ codex mcp add bitbucket \
 | `get_attachment` | Download an attachment by ID |
 | `get_attachment_metadata` | Get attachment metadata |
 | `save_attachment_metadata` | Create or update attachment metadata |
+
+### Dangerous Delete (Tier-1, requires `BITBUCKET_ALLOW_DANGEROUS_DELETE=1`)
+| Tool | Description |
+|---|---|
+| `delete_branch` | Delete a branch (irreversible) |
+| `delete_tag` | Delete a tag (irreversible) |
+| `delete_pull_request` | Delete a PR and all its contents |
+| `delete_pull_request_comment` | Delete a PR comment |
+| `delete_pull_request_task` | Delete a PR task |
+| `delete_attachment` | Delete an attachment |
+| `delete_attachment_metadata` | Delete attachment metadata |
+
+### Destructive Delete (Tier-2, requires both `BITBUCKET_ALLOW_DANGEROUS_DELETE=1` and `BITBUCKET_ALLOW_DESTRUCTIVE_DELETE=1`)
+| Tool | Description |
+|---|---|
+| `delete_project` | Delete a project and all its repositories (irreversible) |
+| `delete_repository` | Delete a repository and all its contents (irreversible) |
 
 ## Development
 
