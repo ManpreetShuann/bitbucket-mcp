@@ -443,16 +443,16 @@ uv run ruff check src/ tests/   # Lint
 uv run ruff format src/ tests/  # Format
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for full development guidelines.
+See [CONTRIBUTING.md](https://github.com/ManpreetShuann/bitbucket-server-mcp/blob/master/CONTRIBUTING.md) for full development guidelines.
 
 ## Pagination
 
 All list tools accept `start` (default 0) and `limit` (default 25) parameters. Responses include `isLastPage` and `nextPageStart` for fetching subsequent pages.
 
 ## Security
-
-See [SECURITY.md](SECURITY.md) for our security policy and vulnerability reporting instructions.
+ 
+See [SECURITY.md](https://github.com/ManpreetShuann/bitbucket-server-mcp/blob/master/SECURITY.md) for our security policy and vulnerability reporting instructions.
 
 ## License
 
-[MIT](LICENSE)
+[MIT](https://github.com/ManpreetShuann/bitbucket-server-mcp/blob/master/LICENSE)
