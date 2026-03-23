@@ -5,7 +5,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/bitbucket-server-mcp)](https://pypi.org/project/bitbucket-server-mcp/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-An MCP (Model Context Protocol) server for Atlassian Bitbucket Server / Data Center (Enterprise). Provides 66 tools for reading and writing projects, repositories, branches, files, commits, pull requests, and code search — with **opt-in gated deletion operations** (disabled by default, see [SECURITY.md](SECURITY.md)).
+An MCP (Model Context Protocol) server for Atlassian Bitbucket Server / Data Center (Enterprise). Provides 66 tools for reading and writing projects, repositories, branches, files, commits, pull requests, and code search — with **opt-in gated deletion operations** (disabled by default, see [SECURITY.md](https://github.com/ManpreetShuann/bitbucket-server-mcp/blob/master/SECURITY.md).
 
 ## Installation
 
