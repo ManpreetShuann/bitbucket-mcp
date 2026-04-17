@@ -21,7 +21,43 @@ When ``fields`` is empty or ``None`` the function behaves identically to
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from typing import Any
+
+
+# ---------------------------------------------------------------------------
+# Epoch timestamp conversion
+# ---------------------------------------------------------------------------
+
+# Known Bitbucket REST API fields that carry millisecond epoch timestamps.
+_TIMESTAMP_FIELDS: frozenset[str] = frozenset({
+    "createdDate",
+    "updatedDate",
+    "closedDate",
+    "authorTimestamp",
+    "committerTimestamp",
+    "targetTimestamp",
+    "resolvedDate",
+})
+
+_MS_THRESHOLD = 1_000_000_000_000  # values >= this are treated as milliseconds
+
+
+def _fmt_epoch(ms: int) -> str:
+    """Convert a millisecond epoch to a local-time string ``yyyy-MM-dd HH:mm:ss``."""
+    return datetime.fromtimestamp(ms / 1000, tz=timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S")
+
+
+def _convert_timestamps(obj: Any) -> Any:
+    """Recursively replace known epoch-ms fields with human-readable date strings."""
+    if isinstance(obj, dict):
+        return {
+            k: (_fmt_epoch(v) if k in _TIMESTAMP_FIELDS and isinstance(v, int) and v >= _MS_THRESHOLD else _convert_timestamps(v))
+            for k, v in obj.items()
+        }
+    if isinstance(obj, list):
+        return [_convert_timestamps(item) for item in obj]
+    return obj
 
 
 # ---------------------------------------------------------------------------
@@ -134,7 +170,10 @@ def json_dumps(obj: Any, fields: str = "", indent: int = 2) -> str:
     Drop-in replacement for ``json.dumps(obj, indent=2)`` in MCP tool handlers.
     When *fields* is non-empty the Atlassian-style filter is applied before
     serialisation, reducing the payload to only the requested paths.
+    Epoch millisecond timestamps in known date fields are always converted to
+    human-readable local-time strings (``yyyy-MM-dd HH:mm:ss``).
     """
     if fields:
         obj = apply_fields(obj, fields)
+    obj = _convert_timestamps(obj)
     return json.dumps(obj, indent=indent, ensure_ascii=False)
