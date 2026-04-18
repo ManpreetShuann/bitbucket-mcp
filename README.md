@@ -451,6 +451,44 @@ See [CONTRIBUTING.md](https://github.com/ManpreetShuann/bitbucket-server-mcp/blo
 
 All list tools accept `start` (default 0) and `limit` (default 25) parameters. Responses include `isLastPage` and `nextPageStart` for fetching subsequent pages.
 
+## Fields Filtering
+
+Most list and get tools accept an optional `fields` parameter. Atlassian Bitbucket Server / Data Center (Enterprise) does not support filtering in their REST API. Therefore filtering is implemented in the MCP server and is performed on the REST response. It lets you limit the response to only the properties you need, which reduces LLM tokens and speeds up processing — especially useful for large result sets like PR lists.
+
+### Syntax
+
+The `fields` parameter uses Atlassian's dot-notation filter syntax:
+
+- **Top-level field:** `id`
+- **Nested field:** `author.user.displayName`
+- **Multiple fields (comma-separated):** `id,title,state`
+- **Fields inside a list response:** prefix with `values.` — e.g. `values.id,values.title`
+
+Supported `fields` syntax (comma-separated list of directives):
+
+* `field.path`   – exclusive selection: keep only the listed paths, drop everything else
+* `-field.path`  – removal: keep all fields except the specified path
+* `+field.path`  – addition: keep all default fields AND add the specified extra path
+* `*`            – wildcard: matches all keys at that level (e.g. ``-links.*``)
+
+Modes can be mixed, e.g.:
+
+```
+-links.*,+values.author.user.displayName
+```
+
+### Examples
+
+**List pull requests — overview only:**
+```
+values.id,values.title,values.state,values.author.user.displayName,values.fromRef.displayId,values.toRef.displayId,values.createdDate,values.updatedDate
+```
+
+### Notes
+
+- Omitting `fields` returns the full Bitbucket REST API response for that endpoint.
+- Fields not present in the response are silently ignored.
+
 ## Security
  
 See [SECURITY.md](https://github.com/ManpreetShuann/bitbucket-server-mcp/blob/master/SECURITY.md) for our security policy and vulnerability reporting instructions.
